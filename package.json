@@ -1,0 +1,13 @@
+{
+  "name": "yahoo-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "imap": "^0.8.19",
+    "mailparser": "^3.6.4",
+    "dotenv": "^16.4.5"
+  }
+}

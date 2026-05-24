@@ -1,0 +1,13 @@
+{
+  "name": "yahoo-mail-mcp",
+  "version": "1.0.0",
+  "description": "Yahoo Mail IMAP MCP server",
+  "server": {
+    "url": "https://YOUR-RENDER-URL.onrender.com/mcp/sse",
+    "oauth": {
+      "authorization_url": "https://YOUR-RENDER-URL.onrender.com/oauth/authorize",
+      "token_url": "https://YOUR-RENDER-URL.onrender.com/oauth/token",
+      "scopes": ["mcp"]
+    }
+  }
+}
