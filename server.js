@@ -9,24 +9,6 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
-
-/* ---------------------------
-   OAUTH (simple dev version)
----------------------------- */
-app.get("/oauth/authorize", (req, res) => {
-  const redirect = req.query.redirect_uri;
-  const code = "dummy-code";
-  res.redirect(`${redirect}?code=${code}`);
-});
-
-app.post("/oauth/token", (req, res) => {
-  res.json({
-    access_token: "dummy-token",
-    token_type: "Bearer",
-    expires_in: 3600
-  });
-});
 
 /* ---------------------------
    IMAP CONNECTION
@@ -48,23 +30,36 @@ function connectIMAP() {
 }
 
 /* ---------------------------
-   MCP SSE ENDPOINT
+   MCP HANDSHAKE (REQUIRED)
 ---------------------------- */
-app.get("/mcp/sse", async (req, res) => {
+app.get("/", (req, res) => {
+  res.json({
+    mcp: "1.0",
+    tools: [
+      {
+        name: "list_emails",
+        description: "List the most recent Yahoo emails"
+      }
+    ]
+  });
+});
+
+/* ---------------------------
+   MCP SSE ENDPOINT (REQUIRED)
+---------------------------- */
+app.get("/sse", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
 
-  function send(event, data) {
-    res.write(`event: ${event}\n`);
-    res.write(`data: ${JSON.stringify(data)}\n\n`);
-  }
-
-  send("ready", {
-    tools: [
-      { name: "list_emails", description: "List emails from Yahoo Mail" }
-    ]
-  });
+  res.write(`event: ready\n`);
+  res.write(
+    `data: ${JSON.stringify({
+      tools: [
+        { name: "list_emails", description: "List the most recent Yahoo emails" }
+      ]
+    })}\n\n`
+  );
 
   req.on("close", () => res.end());
 });
@@ -72,7 +67,7 @@ app.get("/mcp/sse", async (req, res) => {
 /* ---------------------------
    TOOL: LIST EMAILS
 ---------------------------- */
-app.post("/mcp/tool/list_emails", async (req, res) => {
+app.post("/tools/list_emails", async (req, res) => {
   try {
     const imap = await connectIMAP();
 
